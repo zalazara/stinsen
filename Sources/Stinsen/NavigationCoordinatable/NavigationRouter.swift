@@ -302,6 +302,13 @@ public extension NavigationRouter where T: NavigationCoordinatable {
         return coordinator.isRoot(route)
     }
     
+    func isRoot<Output: View>(
+        _ route: KeyPath<T, Transition<T, RootSwitch, Void, Output>>
+    ) -> Bool {
+        return coordinator.isRoot(route)
+    }
+
+    @available(*, deprecated, renamed: "isRoot")
     func isRootk<Output: View>(
         _ route: KeyPath<T, Transition<T, RootSwitch, Void, Output>>
     ) -> Bool {

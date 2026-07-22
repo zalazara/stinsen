@@ -40,7 +40,7 @@ private final class StackTestCoordinator: NavigationCoordinatable {
         PathAggregator(anchor: StackOwner(coordinator), startIndex: 0, allowsPush: true)
     }
 
-    private func keyPathHashes() -> [Int] {
+    private func routeKeyPaths() -> [AnyKeyPath] {
         coordinator.stack.value.map(\.keyPath)
     }
 
@@ -56,10 +56,10 @@ private final class StackTestCoordinator: NavigationCoordinatable {
         XCTAssertEqual(coordinator.stack.value.count, 3)
         XCTAssertEqual(aggregator.path.count, 3)
         XCTAssertEqual(aggregator.path.last?.itemID, topID)
-        XCTAssertEqual(keyPathHashes(), [
-            (\StackTestCoordinator.stepA).hashValue,
-            (\StackTestCoordinator.stepB).hashValue,
-            (\StackTestCoordinator.stepC).hashValue,
+        XCTAssertEqual(routeKeyPaths(), [
+            \StackTestCoordinator.stepA,
+            \StackTestCoordinator.stepB,
+            \StackTestCoordinator.stepC,
         ])
     }
 
@@ -71,7 +71,7 @@ private final class StackTestCoordinator: NavigationCoordinatable {
         coordinator.popLast()
 
         XCTAssertEqual(aggregator.path.count, 1)
-        XCTAssertEqual(keyPathHashes(), [(\StackTestCoordinator.stepB).hashValue])
+        XCTAssertEqual(routeKeyPaths(), [\StackTestCoordinator.stepB])
     }
 
     func testInsertWithInputStoresInput() {
@@ -89,7 +89,7 @@ private final class StackTestCoordinator: NavigationCoordinatable {
         coordinator.insert(\.stepB, at: 1)
 
         XCTAssertEqual(aggregator.path.count, 2)
-        XCTAssertEqual(coordinator.stack.value.last?.keyPath, (\StackTestCoordinator.stepB).hashValue)
+        XCTAssertEqual(coordinator.stack.value.last?.keyPath, \StackTestCoordinator.stepB)
     }
 
     func testInsertCoordinatorSetsParent() {
@@ -112,9 +112,9 @@ private final class StackTestCoordinator: NavigationCoordinatable {
 
         XCTAssertEqual(aggregator.path.count, 2)
         XCTAssertEqual(aggregator.path.last?.itemID, topID)
-        XCTAssertEqual(keyPathHashes(), [
-            (\StackTestCoordinator.stepA).hashValue,
-            (\StackTestCoordinator.stepC).hashValue,
+        XCTAssertEqual(routeKeyPaths(), [
+            \StackTestCoordinator.stepA,
+            \StackTestCoordinator.stepC,
         ])
     }
 
@@ -125,7 +125,7 @@ private final class StackTestCoordinator: NavigationCoordinatable {
         coordinator.remove(at: 1)
 
         XCTAssertEqual(aggregator.path.count, 1)
-        XCTAssertEqual(keyPathHashes(), [(\StackTestCoordinator.stepA).hashValue])
+        XCTAssertEqual(routeKeyPaths(), [\StackTestCoordinator.stepA])
     }
 
     func testRemoveFirstSkipsIntermediateStepOnBack() throws {
@@ -134,14 +134,14 @@ private final class StackTestCoordinator: NavigationCoordinatable {
 
         try coordinator.removeFirst(\.stepB)
 
-        XCTAssertEqual(keyPathHashes(), [
-            (\StackTestCoordinator.stepA).hashValue,
-            (\StackTestCoordinator.stepC).hashValue,
+        XCTAssertEqual(routeKeyPaths(), [
+            \StackTestCoordinator.stepA,
+            \StackTestCoordinator.stepC,
         ])
 
         // Back from C now lands on A.
         aggregator.uiDidSetPath(Array(aggregator.path.prefix(1)))
-        XCTAssertEqual(keyPathHashes(), [(\StackTestCoordinator.stepA).hashValue])
+        XCTAssertEqual(routeKeyPaths(), [\StackTestCoordinator.stepA])
     }
 
     func testRemoveFirstThrowsWhenRouteNotFound() {
@@ -174,9 +174,9 @@ private final class StackTestCoordinator: NavigationCoordinatable {
         coordinator.insertBelowTop(\.stepA)
 
         XCTAssertEqual(aggregator.path.last?.itemID, topID)
-        XCTAssertEqual(keyPathHashes(), [
-            (\StackTestCoordinator.stepA).hashValue,
-            (\StackTestCoordinator.stepC).hashValue,
+        XCTAssertEqual(routeKeyPaths(), [
+            \StackTestCoordinator.stepA,
+            \StackTestCoordinator.stepC,
         ])
     }
 
@@ -186,7 +186,7 @@ private final class StackTestCoordinator: NavigationCoordinatable {
         coordinator.insertBelowTop(\.detail, 7)
 
         XCTAssertEqual(coordinator.stack.value[0].input as? Int, 7)
-        XCTAssertEqual(coordinator.stack.value.last?.keyPath, (\StackTestCoordinator.stepC).hashValue)
+        XCTAssertEqual(coordinator.stack.value.last?.keyPath, \StackTestCoordinator.stepC)
     }
 
     // MARK: Introspection
@@ -241,9 +241,9 @@ private final class StackTestCoordinator: NavigationCoordinatable {
             coordinator.remove(at: index)
         }
 
-        XCTAssertEqual(keyPathHashes(), [
-            (\StackTestCoordinator.stepA).hashValue,
-            (\StackTestCoordinator.stepC).hashValue,
+        XCTAssertEqual(routeKeyPaths(), [
+            \StackTestCoordinator.stepA,
+            \StackTestCoordinator.stepC,
         ])
     }
 
@@ -305,7 +305,7 @@ private final class StackTestCoordinator: NavigationCoordinatable {
         coordinator.insert(\.stepA, at: 0)
         router.pop()
 
-        XCTAssertEqual(keyPathHashes(), [(\StackTestCoordinator.stepA).hashValue])
+        XCTAssertEqual(routeKeyPaths(), [\StackTestCoordinator.stepA])
     }
 
     func testRouterPopIsNoOpWhenItemAlreadyRemoved() {
@@ -321,6 +321,6 @@ private final class StackTestCoordinator: NavigationCoordinatable {
         coordinator.route(to: \.stepA)
         router.pop()
 
-        XCTAssertEqual(keyPathHashes(), [(\StackTestCoordinator.stepA).hashValue])
+        XCTAssertEqual(routeKeyPaths(), [\StackTestCoordinator.stepA])
     }
 }

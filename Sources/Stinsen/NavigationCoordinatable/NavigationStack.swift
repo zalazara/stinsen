@@ -3,7 +3,9 @@ import Combine
 import SwiftUI
 
 struct NavigationRootItem {
-    let keyPath: Int
+    /// The route's keypath itself is the identity; unlike `hashValue`, keypath
+    /// equality cannot collide.
+    let keyPath: AnyKeyPath
     let input: Any?
     let child: ViewPresentable
 }
@@ -61,21 +63,21 @@ public extension NavigationStack {
         - Returns: the hash of the route at the top of the stack or -1
      */
     var currentRoute: Int {
-        return value.last?.keyPath ?? -1
+        return value.last?.keyPath.hashValue ?? -1
     }
 
     /**
     Checks if a particular KeyPath is in a stack
      - Parameter keyPathHash:The hash of the keyPath
-     - Returns: Boolean indiacting whether the route is in the stack
+     - Returns: Boolean indicating whether the route is in the stack
      */
     func isInStack(_ keyPathHash: Int) -> Bool {
-        return value.contains { $0.keyPath == keyPathHash }
+        return value.contains { $0.keyPath.hashValue == keyPathHash }
     }
 
     /**
     Checks if a parent coordinator
-     - Returns: Boolean indiacting whether the coordinator has a parent
+     - Returns: Boolean indicating whether the coordinator has a parent
      */
     func hasParent() -> Bool {
         return self.parent != nil
@@ -88,6 +90,8 @@ struct NavigationStackItem {
     let id: UUID = UUID()
     let presentationType: PresentationType
     let presentable: ViewPresentable
-    let keyPath: Int
+    /// The route's keypath itself is the identity; unlike `hashValue`, keypath
+    /// equality cannot collide.
+    let keyPath: AnyKeyPath
     let input: Any?
 }

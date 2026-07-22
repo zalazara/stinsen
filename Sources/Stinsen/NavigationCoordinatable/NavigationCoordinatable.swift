@@ -326,7 +326,7 @@ public extension NavigationCoordinatable {
         let presentable = a.using(coordinator: self, input: self.stack.initialInput as Any)
         
         let item = NavigationRootItem(
-            keyPath: self.stack.initial.hashValue,
+            keyPath: self.stack.initial,
             input: self.stack.initialInput,
             child: presentable
         )
@@ -400,7 +400,7 @@ public extension NavigationCoordinatable {
             NavigationStackItem(
                 presentationType: transition.type.type,
                 presentable: output,
-                keyPath: route.hashValue,
+                keyPath: route,
                 input: input
             )
         )
@@ -426,7 +426,7 @@ public extension NavigationCoordinatable {
             NavigationStackItem(
                 presentationType: transition.type.type,
                 presentable: output,
-                keyPath: route.hashValue,
+                keyPath: route,
                 input: nil
             )
         )
@@ -454,7 +454,7 @@ public extension NavigationCoordinatable {
             NavigationStackItem(
                 presentationType: transition.type.type,
                 presentable: output,
-                keyPath: route.hashValue,
+                keyPath: route,
                 input: input
             )
         )
@@ -479,7 +479,7 @@ public extension NavigationCoordinatable {
             NavigationStackItem(
                 presentationType: transition.type.type,
                 presentable: output,
-                keyPath: route.hashValue,
+                keyPath: route,
                 input: nil
             )
         )
@@ -491,7 +491,7 @@ public extension NavigationCoordinatable {
         _ input: (value: Input, comparator: ((Input, Input) -> Bool))?
     ) throws -> Output {
         guard let value = stack.value.enumerated().first(where: { item in
-            guard item.element.keyPath == route.hashValue else {
+            guard item.element.keyPath == route else {
                 return false
             }
             
@@ -518,7 +518,7 @@ public extension NavigationCoordinatable {
         _ input: (value: Input, comparator: ((Input, Input) -> Bool))?
     ) throws -> Self {
         guard let value = stack.value.enumerated().first(where: { item in
-            guard item.element.keyPath == route.hashValue else {
+            guard item.element.keyPath == route else {
                 return false
             }
             
@@ -598,7 +598,7 @@ public extension NavigationCoordinatable {
         _ route: KeyPath<Self, Transition<Self, RootSwitch, Input, Output>>,
         inputItem: (input: Input, comparator: (Input, Input) -> Bool)?
     ) -> Output {
-        if stack.root.item.keyPath == route.hashValue {
+        if stack.root.item.keyPath == route {
             if let inputItem = inputItem {
                 if inputItem.comparator(inputItem.input, stack.root.item.input! as! Input) == true {
                     return stack.root.item.child as! Output
@@ -617,7 +617,7 @@ public extension NavigationCoordinatable {
         }
         
         stack.root.item = NavigationRootItem(
-            keyPath: route.hashValue,
+            keyPath: route,
             input: inputItem?.input,
             child: output
         )
@@ -629,7 +629,7 @@ public extension NavigationCoordinatable {
         _ route: KeyPath<Self, Transition<Self, RootSwitch, Input, Output>>,
         inputItem: (input: Input, comparator: (Input, Input) -> Bool)?
     ) -> Self {
-        if stack.root.item.keyPath == route.hashValue {
+        if stack.root.item.keyPath == route {
             if let inputItem = inputItem {
                 if inputItem.comparator(inputItem.input, stack.root.item.input! as! Input) == true {
                     return self
@@ -648,7 +648,7 @@ public extension NavigationCoordinatable {
         }
         
         stack.root.item = NavigationRootItem(
-            keyPath: route.hashValue,
+            keyPath: route,
             input: inputItem?.input,
             child: AnyView(output)
         )
@@ -714,7 +714,7 @@ public extension NavigationCoordinatable {
         _ route: KeyPath<Self, Transition<Self, RootSwitch, Input, Output>>,
         inputItem: (input: Input, comparator: (Input, Input) -> Bool)?
     ) -> Bool {
-        guard stack.root.item.keyPath == route.hashValue else {
+        guard stack.root.item.keyPath == route else {
             return false
         }
         
@@ -733,7 +733,7 @@ public extension NavigationCoordinatable {
         _ route: KeyPath<Self, Transition<Self, RootSwitch, Input, Output>>,
         inputItem: (input: Input, comparator: (Input, Input) -> Bool)?
     ) -> Bool {
-        guard stack.root.item.keyPath == route.hashValue else {
+        guard stack.root.item.keyPath == route else {
             return false
         }
         

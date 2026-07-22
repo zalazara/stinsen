@@ -228,7 +228,7 @@ public extension NavigationCoordinatable {
             NavigationStackItem(
                 presentationType: transition.type.type,
                 presentable: output,
-                keyPath: route.hashValue,
+                keyPath: route,
                 input: Input.self == Void.self ? nil : input
             ),
             at: index
@@ -258,7 +258,7 @@ public extension NavigationCoordinatable {
         _ input: (value: Input, comparator: (Input, Input) -> Bool)?
     ) -> Int? {
         stack.value.firstIndex { item in
-            guard item.keyPath == route.hashValue else {
+            guard item.keyPath == route else {
                 return false
             }
 
