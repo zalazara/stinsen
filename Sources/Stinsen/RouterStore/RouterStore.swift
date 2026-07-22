@@ -1,5 +1,9 @@
 import Foundation
 
+/// Resolves "the first stored router of this type" from a global registry.
+/// With more than one coordinator of the same type alive (two tabs sharing a
+/// flow, a coordinator pushing itself), it can silently return the wrong one.
+@available(*, deprecated, message: "Use @EnvironmentObject var router: MyCoordinator.Router inside views, or inject the coordinator/router where you need it outside the view tree. RouterObject resolves ambiguously when several coordinators of the same type are alive.")
 @MainActor @propertyWrapper public struct RouterObject<Value: Routable> {
     private var storage: RouterStore
     private var retreived: Value?

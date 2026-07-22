@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol LoginCoordinator: AnyObject {
+@MainActor protocol LoginCoordinator: AnyObject {
     func routeToAuthenticated()
 }

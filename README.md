@@ -163,34 +163,26 @@ struct TodosScreen: View {
 }
 ```
 
-You can also use what is called the `RouterStore` to retreive the router. The `RouterStore` saves the instance of the router and you can get it via a custom PropertyWrapper.
+Injecting the coordinator explicitly keeps the dependency visible and testable — a mock coordinator can be passed in a unit test with no further setup:
 
-To retrieve a router:
 ```swift
-class LoginScreenViewModel: ObservableObject {
-    
-    // directly via the RouterStore
-    var main: MainCoordinator.Router? = RouterStore.shared.retrieve()
-    
-    // via the RouterObject property wrapper
-    @RouterObject
-    var unauthenticated: Unauthenticated.Router?
-    
-    init() {
-        
+final class LoginScreenViewModel: ObservableObject {
+    private weak var coordinator: LoginCoordinator?
+
+    init(coordinator: LoginCoordinator) {
+        self.coordinator = coordinator
     }
-    
-    func loginButtonPressed() {
-        main?.root(\.authenticated)
-    }
-    
-    func forgotPasswordButtonPressed() {
-        unauthenticated?.route(to: \.forgotPassword)
+
+    func loginButtonPressed() async throws {
+        try await api.login()
+        await coordinator?.routeToAuthenticated()
     }
 }
 ```
 
 To see this example in action, please check the MVVM-app in _Examples/MVVM_.
+
+> Note: earlier versions promoted `@RouterObject` and `RouterStore.shared.retrieve()`, a global registry that resolves "the first router of this type". This is now deprecated: with more than one coordinator of the same type alive (e.g. two tabs sharing a flow), it can silently return the wrong router. Inside views use `@EnvironmentObject`; outside the view tree, inject the coordinator or router as shown above.
 
 ## Customizing
 
