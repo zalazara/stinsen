@@ -6,10 +6,12 @@ private final class ChildTestCoordinator: NavigationCoordinatable {
     let stack = Stinsen.NavigationStack<ChildTestCoordinator>(initial: \ChildTestCoordinator.start)
 
     @Root var start = makeStart
+    @Root var alternate = makeAlternate
     @Route(.push) var pushed = makePushed
     @Route(.modal) var modal = makeModal
 
     @ViewBuilder func makeStart() -> some View { Text("child-root") }
+    @ViewBuilder func makeAlternate() -> some View { Text("child-alternate") }
     @ViewBuilder func makePushed() -> some View { Text("child-pushed") }
     @ViewBuilder func makeModal() -> some View { Text("child-modal") }
 }
@@ -18,6 +20,7 @@ private final class ParentTestCoordinator: NavigationCoordinatable {
     let stack = Stinsen.NavigationStack<ParentTestCoordinator>(initial: \ParentTestCoordinator.start)
 
     @Root var start = makeStart
+    @Root var alternate = makeAlternate
     @Route(.push) var pushed = makePushed
     @Route(.push) var child = makeChild
     @Route(.modal) var modal = makeModal
@@ -25,6 +28,7 @@ private final class ParentTestCoordinator: NavigationCoordinatable {
     @Route(.fullScreen) var cover = makeCover
 
     @ViewBuilder func makeStart() -> some View { Text("root") }
+    @ViewBuilder func makeAlternate() -> some View { Text("alternate") }
     @ViewBuilder func makePushed() -> some View { Text("pushed") }
     func makeChild() -> ChildTestCoordinator { ChildTestCoordinator() }
     @ViewBuilder func makeModal() -> some View { Text("modal") }
@@ -248,6 +252,52 @@ final class PathAggregatorTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
         RunLoop.main.run(until: Date().addingTimeInterval(0.1))
         XCTAssertEqual(fired, 1)
+    }
+
+    // MARK: Root switching
+
+    /// `root()` and `popToRoot()` are orthogonal: `root()` only swaps which
+    /// view is the stack's base, pushed items stay in the path on top of it.
+    func testRootSwitchKeepsPushedPath() {
+        let aggregator = makeAggregator()
+        parent.route(to: \.pushed)
+
+        parent.root(\.alternate)
+
+        XCTAssertEqual(parent.stack.value.count, 1)
+        XCTAssertEqual(aggregator.path.count, 1)
+        XCTAssertTrue(parent.isRoot(\.alternate))
+    }
+
+    func testPopToRootPlusRootSwitchLandsOnNewRoot() {
+        let aggregator = makeAggregator()
+        parent.route(to: \.pushed)
+        parent.route(to: \.modal)
+
+        parent.popToRoot()
+        parent.root(\.alternate)
+
+        XCTAssertTrue(parent.stack.value.isEmpty)
+        XCTAssertTrue(aggregator.path.isEmpty)
+        XCTAssertNil(aggregator.terminalModal)
+        XCTAssertTrue(parent.isRoot(\.alternate))
+    }
+
+    func testPushedChildRootSwitchSwapsOnlyItsBase() {
+        let aggregator = makeAggregator()
+        let child = parent.route(to: \.child)
+        child.route(to: \.pushed)
+        XCTAssertEqual(aggregator.path.count, 2)
+
+        child.popToRoot()
+        child.root(\.alternate)
+
+        // The child item itself stays pushed in the parent; its own pushes are
+        // gone and its base view is now the alternate root.
+        XCTAssertEqual(parent.stack.value.count, 1)
+        XCTAssertTrue(child.stack.value.isEmpty)
+        XCTAssertEqual(aggregator.path.count, 1)
+        XCTAssertTrue(child.isRoot(\.alternate))
     }
 
     // MARK: Identity
