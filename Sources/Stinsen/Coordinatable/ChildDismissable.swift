@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol ChildDismissable: AnyObject {
+@MainActor public protocol ChildDismissable: AnyObject {
     func dismissChild<T: Coordinatable>(coordinator: T, action: (() -> Void)?)
     var canDismissChild: Bool { get }
 }

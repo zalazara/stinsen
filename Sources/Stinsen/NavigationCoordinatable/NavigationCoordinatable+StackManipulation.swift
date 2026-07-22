@@ -86,9 +86,10 @@ public extension NavigationCoordinatable {
      - Parameter index: The position in the stack (0 is the first pushed item).
      */
     @discardableResult func remove(at index: Int) -> Self {
+        let count = stack.value.count
         precondition(
-            stack.value.indices.contains(index),
-            "remove(at:) index \(index) is out of bounds (stack has \(stack.value.count) items)."
+            index >= 0 && index < count,
+            "remove(at:) index \(index) is out of bounds (stack has \(count) items)."
         )
         stack.value.remove(at: index)
         return self
@@ -210,13 +211,15 @@ public extension NavigationCoordinatable {
         at index: Int
     ) -> Output {
         let transition = self[keyPath: route]
+        let isPush = transition.type.type.isPush
         precondition(
-            transition.type.type.isPush,
+            isPush,
             "insert(_:at:) only supports .push routes; a modal mid-stack would move the modal boundary."
         )
+        let count = stack.value.count
         precondition(
-            index >= 0 && index <= stack.value.count,
-            "insert(_:at:) index \(index) is out of bounds (stack has \(stack.value.count) items)."
+            index >= 0 && index <= count,
+            "insert(_:at:) index \(index) is out of bounds (stack has \(count) items)."
         )
 
         let output = transition.closure(self)(input)

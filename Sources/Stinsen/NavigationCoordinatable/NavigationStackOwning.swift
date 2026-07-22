@@ -6,7 +6,7 @@ import SwiftUI
 /// crosses coordinators of different concrete types, and the
 /// `NavigationCoordinatable` existential is unusable for that because of its
 /// `Self` and associated-type requirements.
-protocol NavigationStackOwning: AnyObject {
+@MainActor protocol NavigationStackOwning: AnyObject {
     /// Identity of the underlying coordinator (not of this wrapper).
     var coordinatorID: ObjectIdentifier { get }
     var stackItems: [NavigationStackItem] { get }
@@ -89,7 +89,7 @@ final class StackOwner<T: NavigationCoordinatable>: NavigationStackOwning {
 }
 
 /// Creates a `StackOwner` from an existential by opening it (SE-0352).
-func makeStackOwner(_ coordinator: any NavigationCoordinatable) -> NavigationStackOwning {
+@MainActor func makeStackOwner(_ coordinator: any NavigationCoordinatable) -> NavigationStackOwning {
     func open<T: NavigationCoordinatable>(_ coordinator: T) -> NavigationStackOwning {
         StackOwner(coordinator)
     }
@@ -104,7 +104,7 @@ protocol NavigationViewCoordinatorMarker: AnyObject {}
 /// (`ViewWrapperCoordinator`). The path walk sees through it so the wrapped
 /// coordinator's routes merge into the enclosing container, and the transform
 /// is applied around the wrapped coordinator's root view.
-protocol ChildCoordinatorWrapping {
+@MainActor protocol ChildCoordinatorWrapping {
     var wrappedChildCoordinator: any Coordinatable { get }
     func wrapRootView(_ view: AnyView) -> AnyView
 }
@@ -112,7 +112,7 @@ protocol ChildCoordinatorWrapping {
 /// Sees through `AnyCoordinator` and `ViewWrapperCoordinator` (but never
 /// `NavigationViewCoordinator`, which is a container boundary), returning the
 /// innermost presentable.
-func unwrapCoordinator(_ presentable: ViewPresentable) -> ViewPresentable {
+@MainActor func unwrapCoordinator(_ presentable: ViewPresentable) -> ViewPresentable {
     var current = presentable
     while !(current is NavigationViewCoordinatorMarker) {
         if let typeErased = current as? AnyCoordinator {
@@ -131,7 +131,7 @@ func unwrapCoordinator(_ presentable: ViewPresentable) -> ViewPresentable {
 /// `NavigationCoordinatable` renders only its root — its pushes are elements
 /// of the enclosing container's path — with any wrapper transforms applied
 /// around it. Everything else keeps its own `view()`.
-func hostedRootView(_ presentable: ViewPresentable) -> AnyView {
+@MainActor func hostedRootView(_ presentable: ViewPresentable) -> AnyView {
     var transforms: [(AnyView) -> AnyView] = []
     var current = presentable
 

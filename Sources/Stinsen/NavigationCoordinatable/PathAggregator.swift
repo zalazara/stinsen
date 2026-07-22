@@ -8,7 +8,7 @@ import SwiftUI
 /// `NavigationCoordinatable`s and stopping at the first modal/fullScreen item.
 /// The model stays the single source of truth: UI-initiated pops are written
 /// back through the coordinators and the path recomputes idempotently.
-final class PathAggregator: ObservableObject {
+@MainActor final class PathAggregator: ObservableObject {
     struct TerminalModal {
         let owner: NavigationStackOwning
         let index: Int
@@ -138,8 +138,12 @@ final class PathAggregator: ObservableObject {
         for (key, owner) in visited {
             owners[key] = owner
             if cancellables[key] == nil {
+                // Stack mutations only happen on the main actor, so the
+                // subjects always fire there.
                 cancellables[key] = owner.stackDidChange.sink { [weak self] in
-                    self?.recompute()
+                    MainActor.assumeIsolated {
+                        self?.recompute()
+                    }
                 }
             }
         }
@@ -172,7 +176,7 @@ final class PathAggregator: ObservableObject {
 
         // Fired outside the current model mutation, so an action that routes
         // again does not re-enter the ongoing recompute.
-        DispatchQueue.main.async {
+        Task { @MainActor in
             for action in actions {
                 action()
             }

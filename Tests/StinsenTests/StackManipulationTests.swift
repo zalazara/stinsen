@@ -28,11 +28,11 @@ private final class StackTestCoordinator: NavigationCoordinatable {
     func makeChild() -> StackChildCoordinator { StackChildCoordinator() }
 }
 
-final class StackManipulationTests: XCTestCase {
+@MainActor final class StackManipulationTests: XCTestCase {
     private var coordinator: StackTestCoordinator!
 
-    override func setUp() {
-        super.setUp()
+    override func setUp() async throws {
+        try await super.setUp()
         coordinator = StackTestCoordinator()
     }
 

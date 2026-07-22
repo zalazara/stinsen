@@ -1,6 +1,6 @@
 import Foundation
 
-@propertyWrapper public struct RouterObject<Value: Routable> {
+@MainActor @propertyWrapper public struct RouterObject<Value: Routable> {
     private var storage: RouterStore
     private var retreived: Value?
     
@@ -22,7 +22,7 @@ import Foundation
     }
 }
 
-public class RouterStore {
+@MainActor public class RouterStore {
     public static let shared = RouterStore()
     
     // an array of weak references

@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 /// The TabCoordinatable is used to represent a coordinator with a TabView
-public protocol TabCoordinatable: Coordinatable {
+@MainActor public protocol TabCoordinatable: Coordinatable {
     typealias Route = TabRoute
     typealias Router = TabRouter<Self>
     associatedtype RouterStoreType

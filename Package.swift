@@ -14,7 +14,14 @@ let package = Package(
         .library(name: "Stinsen", targets: ["Stinsen"])
     ],
     targets: [
-        .target(name: "Stinsen"),
-        .testTarget(name: "StinsenTests", dependencies: ["Stinsen"])
+        .target(
+            name: "Stinsen",
+            swiftSettings: [.enableExperimentalFeature("StrictConcurrency")]
+        ),
+        .testTarget(
+            name: "StinsenTests",
+            dependencies: ["Stinsen"],
+            swiftSettings: [.enableExperimentalFeature("StrictConcurrency")]
+        )
     ]
 )

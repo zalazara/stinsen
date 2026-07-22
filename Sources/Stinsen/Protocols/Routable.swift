@@ -1,5 +1,5 @@
 import Foundation
 
-public protocol Routable: ObservableObject {
+@MainActor public protocol Routable: ObservableObject {
 
 }

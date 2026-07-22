@@ -23,7 +23,7 @@ fileprivate class _AnyCoordinatorBase: Coordinatable {
         fatalError("must override")
     }
 
-    var id: String {
+    nonisolated var id: String {
         fatalError("must override")
     }
 
@@ -37,8 +37,14 @@ fileprivate class _AnyCoordinatorBase: Coordinatable {
 // MARK: - Box container class
 fileprivate final class _AnyCoordinatorBox<Base: Coordinatable>: _AnyCoordinatorBase {
     var base: Base
-    
-    init(_ base: Base) { self.base = base }
+    /// Cached so the nonisolated `id` requirement can be served without
+    /// touching the actor-isolated `base`.
+    private let baseID: String
+
+    init(_ base: Base) {
+        self.base = base
+        self.baseID = base.id
+    }
     
     override func view() -> AnyView {
         self.base.view()
@@ -60,8 +66,8 @@ fileprivate final class _AnyCoordinatorBox<Base: Coordinatable>: _AnyCoordinator
         base.canDismissChild
     }
 
-    override var id: String {
-        base.id
+    nonisolated override var id: String {
+        baseID
     }
 }
 
@@ -87,7 +93,7 @@ public final class AnyCoordinator: Coordinatable {
         box.view()
     }
     
-    public var id: String {
+    nonisolated public var id: String {
         box.id
     }
 

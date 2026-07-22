@@ -35,11 +35,11 @@ private final class ParentTestCoordinator: NavigationCoordinatable {
     @ViewBuilder func makeCover() -> some View { Text("cover") }
 }
 
-final class PathAggregatorTests: XCTestCase {
+@MainActor final class PathAggregatorTests: XCTestCase {
     private var parent: ParentTestCoordinator!
 
-    override func setUp() {
-        super.setUp()
+    override func setUp() async throws {
+        try await super.setUp()
         parent = ParentTestCoordinator()
     }
 

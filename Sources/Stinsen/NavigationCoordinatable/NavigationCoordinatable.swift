@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 import Combine
 
-public protocol NavigationCoordinatable: Coordinatable {
+@MainActor public protocol NavigationCoordinatable: Coordinatable {
     typealias Route = NavigationRoute
     typealias Root = NavigationRoute
     typealias Router = NavigationRouter<Self>

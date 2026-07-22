@@ -10,7 +10,7 @@ struct NavigationRootItem {
 
 /// Wrapper around childCoordinators
 /// Used so that you don't need to write @Published
-public class NavigationRoot: ObservableObject {
+@MainActor public class NavigationRoot: ObservableObject {
     /// Emits after `item` has been mutated, unlike `$item` which emits on willSet.
     let didChangeItem = PassthroughSubject<Void, Never>()
 
@@ -26,7 +26,7 @@ public class NavigationRoot: ObservableObject {
 }
 
 /// Represents a stack of routes
-public class NavigationStack<T: NavigationCoordinatable> {
+@MainActor public class NavigationStack<T: NavigationCoordinatable> {
     /// Dismissal actions keyed by the id of the item whose removal fires them,
     /// so they stay attached to the right item across stack mutations.
     var dismissalAction: [UUID: () -> Void] = [:]
