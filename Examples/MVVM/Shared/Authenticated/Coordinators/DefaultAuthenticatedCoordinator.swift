@@ -10,7 +10,7 @@ import SwiftUI
 import Stinsen
 
 final class DefaultAuthenticatedCoordinator: AuthenticatedCoordinator, NavigationCoordinatable {
-    var stack = NavigationStack(initial: \DefaultAuthenticatedCoordinator.start)
+    var stack = Stinsen.NavigationStack(initial: \DefaultAuthenticatedCoordinator.start)
     @Root var start = makeStart
     
     func makeStart() -> some View {
