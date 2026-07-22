@@ -129,6 +129,9 @@ What actions you can perform from the router/coordinator depends on the kind of 
 * `route` - Navigates to another route.
 * `focusFirst` - Finds the specified route if it exists in the stack, starting from the first item. If found, will remove everything after that.
 * `dismissCoordinator` - Deletes the whole coordinator and it's associated children from the tree.
+* `insert`/`insertBelowTop` - Inserts a route at any position in the stack without navigating, e.g. to fabricate a back destination. See [Stack manipulation](#stack-manipulation).
+* `remove`/`removeFirst` - Removes an item at any position in the stack, so back navigation skips it.
+* `stackCount`/`contains`/`firstIndex` - Read-only introspection of the stack's contents.
 
 # Examples 📱
 
@@ -239,6 +242,44 @@ The `AuthenticatedCoordinator` referenced by the `authenticatedRouter` is a `Tab
 * `route`: will route to the route `Todo` with the specified id. 
 
 Since Stinsen uses KeyPaths to represent the routes, the functions are type-safe and invalid chains cannot be created. This means: if you have a route in _A_ to _B_ and in _B_ to _C_, the app will not compile if you try to route from _A_ to _C_ without routing to _B_ first. Also, you cannot perform actions such as `popToRoot()` on a `TabCoordinatable` and so on.
+
+## Stack manipulation
+
+Like `UINavigationController.setViewControllers`, _Stinsen_ lets you rearrange the navigation stack at any position, not just the top. Since the SwiftUI `NavigationStack` path is derived from the coordinator's stack, any mutation is presented in a single animated transaction. All functions are available both on the coordinator and on its router.
+
+A common use case is fabricating a back destination that was never actually visited, e.g. deep-linking straight to a detail screen while making back lead to the list it conceptually belongs to:
+
+```swift
+coordinator
+    .popToRoot()
+    .route(to: \.detail, productId) // stack: [detail]
+coordinator.insertBelowTop(\.list)  // stack: [list, detail], detail stays visible
+```
+
+Another one is removing an intermediate step, so that in an A → B → C flow, back from C lands on A:
+
+```swift
+try coordinator.removeFirst(\.stepB)
+```
+
+Unlike UIKit, where identity is the view controller instance, in _Stinsen_ identity is the route plus its input. If the same route appears more than once in the stack, disambiguate with the input (using `Equatable` conformance or a custom comparator), just like you would compare instances in UIKit:
+
+```swift
+try coordinator.removeFirst(\.detail, 42)
+try coordinator.removeFirst(\.detail, target) { $0.id == $1.id }
+```
+
+For index-based manipulation, the read-only introspection functions mirror reading `UINavigationController.viewControllers`:
+
+```swift
+coordinator.stackCount                    // number of items in the stack
+coordinator.contains(\.stepB)             // whether a route is in the stack
+if let index = coordinator.firstIndex(of: \.detail, 42) {
+    coordinator.remove(at: index)         // or insert(\.someRoute, at: index)
+}
+```
+
+`insert` only accepts `.push` routes: a modal presentation mid-stack would move the modal boundary and dismiss everything above it. Removing an item fires its `onDismiss` action, if one was registered.
 
 ## Deep Linking
 

@@ -11,6 +11,9 @@ final class TestbedEnvironmentObjectCoordinator: NavigationCoordinatable {
     @Route(.push) var pushScreen = makePushScreen
     @Route(.modal) var modalCoordinator = makeModalCoordinator
     @Route(.push) var pushCoordinator = makePushCoordinator
+    @Route(.push) var stackStepA = makeStackStepA
+    @Route(.push) var stackStepB = makeStackStepB
+    @Route(.push) var stackStepC = makeStackStepC
     
     deinit {
         print("Deinit TestbedEnvironmentObjectCoordinator")

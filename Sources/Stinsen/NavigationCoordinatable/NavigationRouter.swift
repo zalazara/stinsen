@@ -377,3 +377,135 @@ public extension NavigationRouter where T: NavigationCoordinatable {
         return coordinator.hasRoot(route, input, comparator: comparator)
     }
 }
+
+/// Stack manipulation and introspection, forwarded to the coordinator. See
+/// `NavigationCoordinatable` for the full documentation of each function.
+public extension NavigationRouter where T: NavigationCoordinatable {
+    /// The number of items currently in the navigation stack, excluding the root.
+    var stackCount: Int {
+        coordinator.stackCount
+    }
+
+    @discardableResult func insert<Input, Output: View>(
+        _ route: KeyPath<T, Transition<T, Presentation, Input, Output>>,
+        _ input: Input,
+        at index: Int
+    ) -> T {
+        coordinator.insert(route, input, at: index)
+    }
+
+    @discardableResult func insert<Output: View>(
+        _ route: KeyPath<T, Transition<T, Presentation, Void, Output>>,
+        at index: Int
+    ) -> T {
+        coordinator.insert(route, at: index)
+    }
+
+    @discardableResult func insert<Input, Output: Coordinatable>(
+        _ route: KeyPath<T, Transition<T, Presentation, Input, Output>>,
+        _ input: Input,
+        at index: Int
+    ) -> Output {
+        coordinator.insert(route, input, at: index)
+    }
+
+    @discardableResult func insert<Output: Coordinatable>(
+        _ route: KeyPath<T, Transition<T, Presentation, Void, Output>>,
+        at index: Int
+    ) -> Output {
+        coordinator.insert(route, at: index)
+    }
+
+    @discardableResult func insertBelowTop<Output: View>(
+        _ route: KeyPath<T, Transition<T, Presentation, Void, Output>>
+    ) -> T {
+        coordinator.insertBelowTop(route)
+    }
+
+    @discardableResult func insertBelowTop<Input, Output: View>(
+        _ route: KeyPath<T, Transition<T, Presentation, Input, Output>>,
+        _ input: Input
+    ) -> T {
+        coordinator.insertBelowTop(route, input)
+    }
+
+    @discardableResult func insertBelowTop<Output: Coordinatable>(
+        _ route: KeyPath<T, Transition<T, Presentation, Void, Output>>
+    ) -> Output {
+        coordinator.insertBelowTop(route)
+    }
+
+    @discardableResult func insertBelowTop<Input, Output: Coordinatable>(
+        _ route: KeyPath<T, Transition<T, Presentation, Input, Output>>,
+        _ input: Input
+    ) -> Output {
+        coordinator.insertBelowTop(route, input)
+    }
+
+    @discardableResult func remove(at index: Int) -> T {
+        coordinator.remove(at: index)
+    }
+
+    @discardableResult func removeFirst<Input, Output: ViewPresentable>(
+        _ route: KeyPath<T, Transition<T, Presentation, Input, Output>>
+    ) throws -> T {
+        try coordinator.removeFirst(route)
+    }
+
+    @discardableResult func removeFirst<Input: Equatable, Output: ViewPresentable>(
+        _ route: KeyPath<T, Transition<T, Presentation, Input, Output>>,
+        _ input: Input
+    ) throws -> T {
+        try coordinator.removeFirst(route, input)
+    }
+
+    @discardableResult func removeFirst<Input, Output: ViewPresentable>(
+        _ route: KeyPath<T, Transition<T, Presentation, Input, Output>>,
+        _ input: Input,
+        comparator: @escaping (Input, Input) -> Bool
+    ) throws -> T {
+        try coordinator.removeFirst(route, input, comparator: comparator)
+    }
+
+    func contains<Input, Output: ViewPresentable>(
+        _ route: KeyPath<T, Transition<T, Presentation, Input, Output>>
+    ) -> Bool {
+        coordinator.contains(route)
+    }
+
+    func contains<Input: Equatable, Output: ViewPresentable>(
+        _ route: KeyPath<T, Transition<T, Presentation, Input, Output>>,
+        _ input: Input
+    ) -> Bool {
+        coordinator.contains(route, input)
+    }
+
+    func contains<Input, Output: ViewPresentable>(
+        _ route: KeyPath<T, Transition<T, Presentation, Input, Output>>,
+        _ input: Input,
+        comparator: @escaping (Input, Input) -> Bool
+    ) -> Bool {
+        coordinator.contains(route, input, comparator: comparator)
+    }
+
+    func firstIndex<Input, Output: ViewPresentable>(
+        of route: KeyPath<T, Transition<T, Presentation, Input, Output>>
+    ) -> Int? {
+        coordinator.firstIndex(of: route)
+    }
+
+    func firstIndex<Input: Equatable, Output: ViewPresentable>(
+        of route: KeyPath<T, Transition<T, Presentation, Input, Output>>,
+        _ input: Input
+    ) -> Int? {
+        coordinator.firstIndex(of: route, input)
+    }
+
+    func firstIndex<Input, Output: ViewPresentable>(
+        of route: KeyPath<T, Transition<T, Presentation, Input, Output>>,
+        _ input: Input,
+        comparator: @escaping (Input, Input) -> Bool
+    ) -> Int? {
+        coordinator.firstIndex(of: route, input, comparator: comparator)
+    }
+}

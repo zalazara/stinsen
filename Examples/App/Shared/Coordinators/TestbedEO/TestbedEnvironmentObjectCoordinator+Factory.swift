@@ -24,4 +24,16 @@ extension TestbedEnvironmentObjectCoordinator {
     @ViewBuilder func makeStart() -> some View {
         TestbedEnvironmentObjectScreen()
     }
+
+    @ViewBuilder func makeStackStepA() -> some View {
+        StackManipulationStepScreen(step: .a)
+    }
+
+    @ViewBuilder func makeStackStepB() -> some View {
+        StackManipulationStepScreen(step: .b)
+    }
+
+    @ViewBuilder func makeStackStepC() -> some View {
+        StackManipulationStepScreen(step: .c)
+    }
 }
