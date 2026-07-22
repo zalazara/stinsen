@@ -344,7 +344,11 @@ public extension NavigationCoordinatable {
     
     internal func popTo(_ int: Int, _ action: (() -> ())? = nil) {
         if let action = action {
-            self.stack.dismissalAction[int] = action
+            // Attach to the first item about to be removed; if the pop is a
+            // no-op there is no dismissal, so the action is dropped.
+            if let firstRemoved = self.stack.value[safe: int + 1] {
+                self.stack.dismissalAction[firstRemoved.id] = action
+            }
         }
 
         guard int + 1 <= self.stack.value.count else {
@@ -360,6 +364,13 @@ public extension NavigationCoordinatable {
         }
     }
     
+    /// Attaches `onDismiss` to the item just appended, so it fires when that
+    /// item leaves the stack regardless of later index shifts.
+    private func attachDismissalActionToLastItem(_ onDismiss: @escaping () -> Void) {
+        guard let item = stack.value.last else { return }
+        stack.dismissalAction[item.id] = onDismiss
+    }
+
     func view() -> AnyView {
         return AnyView(NavigationCoordinatableView(coordinator: self))
     }
@@ -374,8 +385,9 @@ public extension NavigationCoordinatable {
         _ input: Input,
         onDismiss: @escaping () -> ()
     ) -> Output {
-        stack.dismissalAction[stack.value.count - 1] = onDismiss
-        return self.route(to: route, input)
+        let output = self.route(to: route, input)
+        attachDismissalActionToLastItem(onDismiss)
+        return output
     }
     
     @discardableResult func route<Input, Output: Coordinatable>(
@@ -400,8 +412,9 @@ public extension NavigationCoordinatable {
         to route: KeyPath<Self, Transition<Self, Presentation, Void, Output>>,
         onDismiss: @escaping () -> ()
     ) -> Output {
-        stack.dismissalAction[stack.value.count - 1] = onDismiss
-        return self.route(to: route)
+        let output = self.route(to: route)
+        attachDismissalActionToLastItem(onDismiss)
+        return output
     }
     
     @discardableResult func route<Output: Coordinatable>(
@@ -426,8 +439,9 @@ public extension NavigationCoordinatable {
         _ input: Input,
         onDismiss: @escaping () -> ()
     ) -> Self {
-        stack.dismissalAction[stack.value.count - 1] = onDismiss
-        return self.route(to: route, input)
+        self.route(to: route, input)
+        attachDismissalActionToLastItem(onDismiss)
+        return self
     }
     
     @discardableResult func route<Input, Output: View>(
@@ -451,8 +465,9 @@ public extension NavigationCoordinatable {
         to route: KeyPath<Self, Transition<Self, Presentation, Void, Output>>,
         onDismiss: @escaping () -> ()
     ) -> Self {
-        stack.dismissalAction[stack.value.count - 1] = onDismiss
-        return self.route(to: route)
+        self.route(to: route)
+        attachDismissalActionToLastItem(onDismiss)
+        return self
     }
     
     @discardableResult func route<Output: View>(

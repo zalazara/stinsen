@@ -16,8 +16,8 @@ protocol NavigationStackOwning: AnyObject {
     var stackDidChange: AnyPublisher<Void, Never> { get }
     /// Truncates the stack so `index` is the topmost remaining item (-1 clears it).
     func popToIndex(_ index: Int)
-    /// Reads and clears the dismissal action stored for `index`.
-    func takeDismissalAction(at index: Int) -> (() -> Void)?
+    /// Reads and clears the dismissal action stored for the item with `id`.
+    func takeDismissalAction(for id: UUID) -> (() -> Void)?
     /// The coordinator's root, including `customize()` and the level -1 router.
     func rootView() -> AnyView
     /// The view for the stack item at `index`, with its router injected.
@@ -61,9 +61,9 @@ final class StackOwner<T: NavigationCoordinatable>: NavigationStackOwning {
         coordinator.appear(index)
     }
 
-    func takeDismissalAction(at index: Int) -> (() -> Void)? {
-        let action = coordinator.stack.dismissalAction[index]
-        coordinator.stack.dismissalAction[index] = nil
+    func takeDismissalAction(for id: UUID) -> (() -> Void)? {
+        let action = coordinator.stack.dismissalAction[id]
+        coordinator.stack.dismissalAction[id] = nil
         return action
     }
 
@@ -78,6 +78,7 @@ final class StackOwner<T: NavigationCoordinatable>: NavigationStackOwning {
 
         let router: NavigationRouter<T> = NavigationRouter(
             id: index,
+            itemID: item.id,
             coordinator: coordinator.routerStorable
         )
 

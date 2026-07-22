@@ -153,8 +153,8 @@ final class PathAggregator: ObservableObject {
         var actions: [() -> Void] = []
 
         if let oldModal = terminalModal, oldModal.itemID != newModal?.itemID {
-            let stillPresent = oldModal.owner.stackItems[safe: oldModal.index]?.id == oldModal.itemID
-            if !stillPresent, let action = oldModal.owner.takeDismissalAction(at: oldModal.index - 1) {
+            let stillPresent = oldModal.owner.stackItems.contains { $0.id == oldModal.itemID }
+            if !stillPresent, let action = oldModal.owner.takeDismissalAction(for: oldModal.itemID) {
                 actions.append(action)
             }
         }
@@ -162,8 +162,8 @@ final class PathAggregator: ObservableObject {
         let newIDs = Set(newPath.map(\.itemID))
         for element in path.reversed() where !newIDs.contains(element.itemID) {
             guard let owner = owners[element.ownerID] else { continue }
-            let stillPresent = owner.stackItems[safe: element.index]?.id == element.itemID
-            if !stillPresent, let action = owner.takeDismissalAction(at: element.index - 1) {
+            let stillPresent = owner.stackItems.contains { $0.id == element.itemID }
+            if !stillPresent, let action = owner.takeDismissalAction(for: element.itemID) {
                 actions.append(action)
             }
         }

@@ -27,7 +27,9 @@ public class NavigationRoot: ObservableObject {
 
 /// Represents a stack of routes
 public class NavigationStack<T: NavigationCoordinatable> {
-    var dismissalAction: [Int: () -> Void] = [:]
+    /// Dismissal actions keyed by the id of the item whose removal fires them,
+    /// so they stay attached to the right item across stack mutations.
+    var dismissalAction: [UUID: () -> Void] = [:]
 
     weak var parent: ChildDismissable?
     var poppedTo = PassthroughSubject<Int, Never>()

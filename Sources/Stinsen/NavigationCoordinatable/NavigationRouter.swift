@@ -2,15 +2,30 @@ import Foundation
 import SwiftUI
 
 public final class NavigationRouter<T>: Routable {
+    /// The index of the stack item this router was created for. Kept for
+    /// backwards compatibility; may be stale after stack mutations — internal
+    /// operations resolve the current position via `itemID` instead.
     public let id: Int
+
+    /// Stable identity of the stack item this router belongs to. `nil` for the
+    /// root router (id -1) and routers created through the public initializer.
+    let itemID: UUID?
+
     public var coordinator: T {
         _coordinator.value as! T
     }
-    
+
     private var _coordinator: WeakRef<AnyObject>
-    
+
     public init(id: Int, coordinator: T) {
         self.id = id
+        self.itemID = nil
+        self._coordinator = WeakRef(value: coordinator as AnyObject)
+    }
+
+    init(id: Int, itemID: UUID?, coordinator: T) {
+        self.id = id
+        self.itemID = itemID
         self._coordinator = WeakRef(value: coordinator as AnyObject)
     }
 }
@@ -22,9 +37,18 @@ public extension NavigationRouter where T: NavigationCoordinatable {
     @discardableResult func popToRoot(_ action: (() -> ())? = nil) -> T {
         coordinator.popToRoot(action)
     }
-    
+
     func pop(_ action: (() -> ())? = nil) {
-        coordinator.popTo(self.id - 1, action)
+        guard let index = currentIndex else { return }
+        coordinator.popTo(index - 1, action)
+    }
+
+    /// The item's current index in the coordinator's stack. Falls back to the
+    /// creation-time `id` for routers without item identity (the root router);
+    /// `nil` when the item has already left the stack.
+    private var currentIndex: Int? {
+        guard let itemID = itemID else { return id }
+        return coordinator.stack.value.firstIndex { $0.id == itemID }
     }
     
     func popLast(_ action: (() -> ())? = nil) {
