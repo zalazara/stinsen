@@ -361,7 +361,7 @@ public extension NavigationCoordinatable {
     }
     
     func view() -> AnyView {
-        return AnyView(NavigationCoordinatableView(id: -1, coordinator: self))
+        return AnyView(NavigationCoordinatableView(coordinator: self))
     }
 
     @discardableResult func popToRoot(_ action: (() -> ())? = nil) -> Self {

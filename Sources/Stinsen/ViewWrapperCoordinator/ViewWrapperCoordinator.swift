@@ -1,9 +1,9 @@
 import Foundation
 import SwiftUI
 
-/// The NavigationViewCoordinator is used to represent a coordinator with a NavigationView
+/// The ViewWrapperCoordinator is used to represent a coordinator wrapped in a custom view
 open class ViewWrapperCoordinator<T: Coordinatable, V: View>: Coordinatable {
-    public func dismissChild<T: Coordinatable>(coordinator: T, action: (() -> Void)?) {
+    public func dismissChild<C: Coordinatable>(coordinator: C, action: (() -> Void)?) {
         guard let parent = self.parent else {
             assertionFailure("Can not dismiss a coordinator since no coordinator is presented.")
             return
@@ -36,5 +36,13 @@ open class ViewWrapperCoordinator<T: Coordinatable, V: View>: Coordinatable {
         self.child = childCoordinator
         self.viewFactory = view
         self.child.parent = self
+    }
+}
+
+extension ViewWrapperCoordinator: ChildCoordinatorWrapping {
+    var wrappedChildCoordinator: any Coordinatable { child }
+
+    func wrapRootView(_ view: AnyView) -> AnyView {
+        AnyView(viewFactory(self)(view))
     }
 }

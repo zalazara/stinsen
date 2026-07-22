@@ -3,10 +3,10 @@
 </p>
 
 [![Language](https://img.shields.io/static/v1.svg?label=language&message=Swift%205&color=FA7343&logo=swift&style=flat-square)](https://swift.org)
-[![Platform](https://img.shields.io/static/v1.svg?label=platforms&message=iOS%20|%20tvOS%20|%20watchOS%20|%20macOS&logo=apple&style=flat-square)](https://apple.com)
+[![Platform](https://img.shields.io/static/v1.svg?label=platforms&message=iOS%2016%20|%20tvOS%2016%20|%20watchOS%209%20|%20macOS%2013&logo=apple&style=flat-square)](https://apple.com)
 [![License](https://img.shields.io/cocoapods/l/Crossroad.svg?style=flat-square)](https://github.com/rundfunk47/stinsen/blob/main/LICENSE)
 
-Simple, powerful and elegant implementation of the Coordinator pattern in SwiftUI. Stinsen is written using 100% SwiftUI which makes it work seamlessly across iOS, tvOS, watchOS and macOS devices.
+Simple, powerful and elegant implementation of the Coordinator pattern in SwiftUI. Stinsen is written using 100% SwiftUI and built on `NavigationStack`, which makes it work seamlessly across iOS 16+, tvOS 16+, watchOS 9+ and macOS 13+.
 
 # Why? 🤔
 
@@ -51,7 +51,7 @@ _Stinsen_ out of the box has two different kinds of `Coordinatable` protocols yo
 * `NavigationCoordinatable` - For navigational flows. Make sure to wrap these in a NavigationViewCoordinator if you wish to push on the navigation stack.
 * `TabCoordinatable` - For TabViews.
 
-In addition, _Stinsen_ also has two Coordinators you can use, `ViewWrapperCoordinator` and `NavigationViewCoordinator`. `ViewWrapperCoordinator` is a coordinator you can either subclass or use right away to wrap your coordinator in a view, and `NavigationViewCoordinator` is a `ViewWrapperCoordinator` subclass that wraps your coordinator in a `NavigationView`.   
+In addition, _Stinsen_ also has two Coordinators you can use, `ViewWrapperCoordinator` and `NavigationViewCoordinator`. `ViewWrapperCoordinator` is a coordinator you can either subclass or use right away to wrap your coordinator in a view, and `NavigationViewCoordinator` is a `ViewWrapperCoordinator` subclass that wraps your coordinator in a `NavigationStack`.   
 
 ## Showing the coordinator for the user
 The view for the coordinator can be created using `.view()`, so in order to show a coordinator to the user you would just do something like:
@@ -294,8 +294,8 @@ end
 ```
 # Known issues and bugs 🐛
 
-* _Stinsen_ does not support `DoubleColumnNavigationViewStyle`. The reason for this is that it does not work as expected due to issues with `isActive` in SwiftUI. _Workaround:_ Use UIViewRepresentable or create your own implementation.
-* _Stinsen_ works pretty bad in various older versions of iOS 13 due to, well, iOS 13 not really being that good at SwiftUI. Rather than trying to set a minimum version that _Stinsen_ supports, you're on your own if you're supporting iOS 13 to figure out whether or not the features you use actually work. Generally, version 13.4 and above seem to work alright.
+* _Stinsen_ does not support `NavigationSplitView`. _Workaround:_ Use UIViewRepresentable or create your own implementation.
+* Pushing a `NavigationViewCoordinator` is not supported, since SwiftUI does not allow nesting a `NavigationStack` inside a pushed view. Present it as a modal instead.
 
 # Who are responsible? 🙋🏿‍♂️
 

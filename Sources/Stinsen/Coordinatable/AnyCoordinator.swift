@@ -93,7 +93,13 @@ public final class AnyCoordinator: Coordinatable {
 
     private let box: _AnyCoordinatorBase
 
+    /// The wrapped coordinator, so the path walk can see through the type
+    /// erasure and merge a pushed `NavigationCoordinatable`'s stack into the
+    /// enclosing container.
+    let wrappedCoordinator: any Coordinatable
+
     public init<Base: Coordinatable>(_ base: Base) {
         box = _AnyCoordinatorBox(base)
+        wrappedCoordinator = base
     }
 }

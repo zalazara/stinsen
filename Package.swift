@@ -1,19 +1,20 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.9
 
 import PackageDescription
 
 let package = Package(
     name: "Stinsen",
     platforms: [
-        .iOS(.v13),
-        .macOS(.v10_15),
-        .tvOS(.v13),
-        .watchOS(.v7)
+        .iOS(.v16),
+        .macOS(.v13),
+        .tvOS(.v16),
+        .watchOS(.v9)
     ],
     products: [
         .library(name: "Stinsen", targets: ["Stinsen"])
     ],
     targets: [
-        .target(name: "Stinsen")
+        .target(name: "Stinsen"),
+        .testTarget(name: "StinsenTests", dependencies: ["Stinsen"])
     ]
 )

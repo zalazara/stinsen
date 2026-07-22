@@ -11,8 +11,15 @@ struct NavigationRootItem {
 /// Wrapper around childCoordinators
 /// Used so that you don't need to write @Published
 public class NavigationRoot: ObservableObject {
-    @Published var item: NavigationRootItem
-    
+    /// Emits after `item` has been mutated, unlike `$item` which emits on willSet.
+    let didChangeItem = PassthroughSubject<Void, Never>()
+
+    @Published var item: NavigationRootItem {
+        didSet {
+            didChangeItem.send()
+        }
+    }
+
     init(item: NavigationRootItem) {
         self.item = item
     }
@@ -21,14 +28,21 @@ public class NavigationRoot: ObservableObject {
 /// Represents a stack of routes
 public class NavigationStack<T: NavigationCoordinatable> {
     var dismissalAction: [Int: () -> Void] = [:]
-    
+
     weak var parent: ChildDismissable?
     var poppedTo = PassthroughSubject<Int, Never>()
     let initial: PartialKeyPath<T>
     let initialInput: Any?
     var root: NavigationRoot!
-    
-    @Published var value: [NavigationStackItem]
+
+    /// Emits after `value` has been mutated, unlike `$value` which emits on willSet.
+    let didChangeValue = PassthroughSubject<Void, Never>()
+
+    @Published var value: [NavigationStackItem] {
+        didSet {
+            didChangeValue.send()
+        }
+    }
     
     public init(initial: PartialKeyPath<T>, _ initialInput: Any? = nil) {
         self.value = []
@@ -67,6 +81,9 @@ public extension NavigationStack {
 }
 
 struct NavigationStackItem {
+    /// Unique identity for this entry, so that popping and re-routing to the
+    /// same route yields a distinct `NavigationStack` path element.
+    let id: UUID = UUID()
     let presentationType: PresentationType
     let presentable: ViewPresentable
     let keyPath: Int
