@@ -64,7 +64,23 @@ import SwiftUI
         resubscribe(to: visited)
 
         if newPath != path {
-            path = newPath
+            // SwiftUI's NavigationStack matches levels positionally: a pure
+            // append or truncation animates as a normal push/pop, but any
+            // mid-stack surgery (insert/remove below the top) would animate a
+            // spurious push/pop of the unchanged top view. Apply those without
+            // animation, like `setViewControllers(_:animated: false)`.
+            let isAppend = newPath.count > path.count && Array(newPath.prefix(path.count)) == path
+            let isTruncation = newPath.count < path.count && Array(path.prefix(newPath.count)) == newPath
+
+            if isAppend || isTruncation {
+                path = newPath
+            } else {
+                var transaction = Transaction()
+                transaction.disablesAnimations = true
+                withTransaction(transaction) {
+                    path = newPath
+                }
+            }
         }
         if newModal?.itemID != terminalModal?.itemID {
             terminalModal = newModal
