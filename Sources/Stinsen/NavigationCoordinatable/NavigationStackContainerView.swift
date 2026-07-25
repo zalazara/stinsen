@@ -16,12 +16,7 @@ struct NavigationStackContainerView: View {
     }
 
     var body: some View {
-        SwiftUI.NavigationStack(
-            path: Binding(
-                get: { aggregator.path },
-                set: { aggregator.uiDidSetPath($0) }
-            )
-        ) {
+        SwiftUI.NavigationStack(path: aggregator.pathBinding) {
             rootContent
                 .navigationDestination(for: StinsenPathElement.self) { element in
                     aggregator.destination(for: element)

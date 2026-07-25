@@ -152,6 +152,29 @@ private final class ParentTestCoordinator: NavigationCoordinatable {
         XCTAssertEqual(aggregator.path.count, 1)
     }
 
+    // MARK: Path binding
+
+    /// The binding is stored rather than rebuilt inside `body`: a fresh binding
+    /// on every evaluation makes `NavigationStack` re-sync its levels and fire a
+    /// spurious `onAppear` two levels below the top.
+    func testPathBindingReadsTheCurrentPath() {
+        let aggregator = makeAggregator()
+        parent.route(to: \.pushed)
+
+        XCTAssertEqual(aggregator.pathBinding.wrappedValue, aggregator.path)
+    }
+
+    func testPathBindingWriteBackPopsTheModel() {
+        let aggregator = makeAggregator()
+        parent.route(to: \.pushed)
+        parent.route(to: \.pushed)
+
+        aggregator.pathBinding.wrappedValue = Array(aggregator.path.prefix(1))
+
+        XCTAssertEqual(parent.stack.value.count, 1)
+        XCTAssertEqual(aggregator.path.count, 1)
+    }
+
     // MARK: UI-initiated pops (path binding write-back)
 
     func testUIPopTruncatesOwnerStack() {

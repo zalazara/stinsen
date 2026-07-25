@@ -25,6 +25,20 @@ import SwiftUI
     /// leading modal, but pushes are dead ends (there is no container above).
     private let allowsPush: Bool
 
+    /// The path binding handed to `SwiftUI.NavigationStack`, built once.
+    ///
+    /// A `Binding(get:set:)` created inside `body` is a new binding on every
+    /// evaluation, and `NavigationStack` reacts to that by re-syncing its
+    /// levels: on every push it fires a spurious `onAppear` on the level two
+    /// below the new top — a screen that never left the stack. Whatever that
+    /// `onAppear` triggers (navigation, timers, analytics) then runs again,
+    /// and if it navigates, the new push feeds the next spurious `onAppear`
+    /// and the flow never settles.
+    private(set) lazy var pathBinding: Binding<[StinsenPathElement]> = Binding(
+        get: { [weak self] in self?.path ?? [] },
+        set: { [weak self] in self?.uiDidSetPath($0) }
+    )
+
     private var owners: [ObjectIdentifier: NavigationStackOwning] = [:]
     private var resolution: [UUID: (owner: NavigationStackOwning, index: Int)] = [:]
     private var cancellables: [ObjectIdentifier: AnyCancellable] = [:]
